@@ -175,10 +175,9 @@
 
   <script>
     // Get business/location from URL
-    const pathParts = window.location.pathname.split('/').filter(p => p);
-    const slug = pathParts[pathParts.length - 2];
-    const locationId = pathParts[pathParts.length - 1];
-    const businessSlug = new URLSearchParams(window.location.search).get('business') || slug;
+    const pathParts = window.location.pathname.split('/').filter(p => p && !p.endsWith('.html'));
+    const locationId = pathParts.length > 0 && pathParts[pathParts.length - 1].length > 5 ? pathParts[pathParts.length - 1] : null;
+    const businessSlug = new URLSearchParams(window.location.search).get('business') || 'the-local-choice';
     
     let currentStep = 'location';
     let state = {
