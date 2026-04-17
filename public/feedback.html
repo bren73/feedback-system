@@ -251,6 +251,13 @@
     
     function yesContact() {
       state.contactRequested = true;
+      // Change follow-up message based on rating
+      const question = document.getElementById('contact-question');
+      if (state.rating <= 6) {
+        question.textContent = 'Would you like the owner to follow up?';
+      } else {
+        question.textContent = 'Would you like the manager to follow up?';
+      }
       showStep('contact-form');
     }
     
@@ -283,9 +290,15 @@
       
       // Show appropriate thank you
       if (state.rating >= 9) {
-        // Check if we have google reviews URL
         showStep('thank-happy');
       } else if (state.contactRequested) {
+        // Update message based on rating
+        const contactThank = document.querySelector('#step-thank-contact p');
+        if (state.rating <= 6) {
+          contactThank.textContent = 'The owner will be in touch soon.';
+        } else {
+          contactThank.textContent = 'The manager will be in touch soon.';
+        }
         showStep('thank-contact');
       } else {
         showStep('thank-nocontact');
