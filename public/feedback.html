@@ -60,7 +60,7 @@
 <body>
   <div class="container">
     <div class="card">
-      <div class="logo"><span>+</span> the local choice</div>
+      <div class="logo"><span>+</span> The Local Choice</div>
       <div class="tagline">here for you</div>
       
       <!-- Step 1: Location -->
@@ -71,16 +71,16 @@
       
       <!-- Step 2: Rating -->
       <div id="step-rating" class="hidden">
-        <h2>How was your experience?</h2>
-        <p>(1 = poor, 10 = excellent)</p>
+        <h2>How was your visit today?</h2>
+        <p>Tap a number to rate</p>
         <div class="rating-grid" id="rating-grid"></div>
       </div>
       
       <!-- Step 3: Feedback (1-6) -->
       <div id="step-feedback-bad" class="hidden">
         <h2>We're sorry to hear that</h2>
-        <p>What could we have done better?</p>
-        <textarea id="feedback-text-bad" placeholder="Please share your feedback..."></textarea>
+        <p>What went wrong?</p>
+        <textarea id="feedback-text-bad" placeholder="Tell us what happened..."></textarea>
         <div class="nav">
           <button class="prev" onclick="prevStep()">Previous</button>
           <button class="next" onclick="nextStep('feedback-bad')">Next</button>
@@ -89,9 +89,9 @@
       
       <!-- Step 3: Feedback (7-8) -->
       <div id="step-feedback-neutral" class="hidden">
-        <h2>Thanks for rating!</h2>
-        <p>Can you share why you chose that score?</p>
-        <textarea id="feedback-text-neutral" placeholder="Please share your feedback..."></textarea>
+        <h2>Thanks for your feedback!</h2>
+        <p>What could make it better?</p>
+        <textarea id="feedback-text-neutral" placeholder="Your suggestions..."></textarea>
         <div class="nav">
           <button class="prev" onclick="prevStep()">Previous</button>
           <button class="next" onclick="nextStep('feedback-neutral')">Next</button>
@@ -100,7 +100,7 @@
       
       <!-- Step 4: Contact? -->
       <div id="step-contact" class="hidden">
-        <h2 id="contact-question">Can our pharmacy manager contact you?</h2>
+        <h2 id="contact-question">Would you like us to follow up?</h2>
         <div class="yesno">
           <button class="yes" onclick="yesContact()">Yes</button>
           <button class="no" onclick="noContact()">No</button>
@@ -146,28 +146,28 @@
       <!-- Thank You (1-6 / 7-8 with contact) -->
       <div id="step-thank-contact" class="hidden">
         <div class="thank-you">
-          <div class="icon">✓</div>
+          <div class="icon">📞</div>
           <h2>Thank you!</h2>
-          <p>Thanks, our pharmacy manager will be in touch as soon as possible.</p>
+          <p>We'll be in touch soon.</p>
         </div>
       </div>
       
       <!-- Thank You (1-6 no contact) -->
       <div id="step-thank-nocontact" class="hidden">
         <div class="thank-you">
-          <div class="icon">✓</div>
+          <div class="icon">💭</div>
           <h2>Thank you!</h2>
-          <p>Thanks for your feedback. We'll use it to improve our service.</p>
+          <p>Your feedback helps us serve you better.</p>
         </div>
       </div>
       
       <!-- Thank You (9-10) -->
       <div id="step-thank-happy" class="hidden">
         <div class="thank-you">
-          <div class="icon">⭐</div>
-          <h2>Thank you!</h2>
-          <p>We hope to see you again soon.</p>
-          <a href="#" class="google-btn" id="google-link" target="_blank">Review us on Google</a>
+          <div class="icon">🌟</div>
+          <h2>Awesome! Thanks!</h2>
+          <p>We're thrilled you had a great experience.</p>
+          <a href="#" class="google-btn" id="google-link" target="_blank">Share the love on Google</a>
         </div>
       </div>
     </div>
