@@ -227,7 +227,16 @@
       else if (step === 'rating') document.getElementById('step-rating').classList.remove('hidden');
       else if (step === 'feedback-bad') document.getElementById('step-feedback-bad').classList.remove('hidden');
       else if (step === 'feedback-neutral') document.getElementById('step-feedback-neutral').classList.remove('hidden');
-      else if (step === 'contact') document.getElementById('step-contact').classList.remove('hidden');
+      else if (step === 'contact') {
+        // Update follow-up text based on rating
+        const question = document.getElementById('contact-question');
+        if (state.rating <= 6) {
+          question.textContent = 'Would you like the owner to follow up?';
+        } else {
+          question.textContent = 'Would you like the manager to follow up?';
+        }
+        document.getElementById('step-contact').classList.remove('hidden');
+      }
       else if (step === 'contact-form') document.getElementById('step-contact-form').classList.remove('hidden');
       else if (step === 'thank-contact') document.getElementById('step-thank-contact').classList.remove('hidden');
       else if (step === 'thank-nocontact') document.getElementById('step-thank-nocontact').classList.remove('hidden');
