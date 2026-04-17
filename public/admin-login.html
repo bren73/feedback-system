@@ -57,7 +57,7 @@
         if (data.success) {
           localStorage.setItem('business_token', data.token);
           localStorage.setItem('business_name', data.business.name);
-          window.location.href = '/admin/dashboard.html';
+          window.location.href = '/dashboard.html';
         } else {
           errorEl.textContent = data.error || 'Login failed';
           errorEl.style.display = 'block';
