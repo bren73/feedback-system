@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - YourFeedback</title>
+  <style>
+    * { box-izing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    .header { background: white; padding: 16px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 20px; font-weight: bold; color: #2E7D32; }
+    .logo span { color: #FF6F00; }
+    .user { color: #666; }
+    .logout { color: #d32f2f; text-decoration: none; margin-left: 16px; }
+    
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .stat-card { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .stat-label { color: #666; font-size: 14px; margin-bottom: 8px; }
+    .stat-value { font-size: 32px; font-weight: bold; color: #333; }
+    .stat-value.issues { color: #d32f2f; }
+    .stat-value.good { color: #4CAF50; }
+    
+    /* Section */
+    .section { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); padding: 24px; margin-bottom: 24px; }
+    .section h2 { margin-bottom: 20px; color: #333; }
+    
+    /* Tabs */
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
+    .tab { padding: 10px 20px; background: none; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; color: #666; }
+    .tab.active { background: #FF6F00; color: white; }
+    
+    /* Reviews */
+    .review-list { display: flex; flex-direction: column; gap: 16px; }
+    .review { border: 1px solid #eee; border-radius: 12px; padding: 20px; }
+    .review-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .review-location { font-weight: 600; color: #333; }
+    .review-date { color: #999; font-size: 14px; }
+    .review-rating { font-size: 20px; }
+    .review-rating.good { color: #4CAF50; }
+    .review-rating.neutral { color: #FF9800; }
+    .review-rating.bad { color: #d32f2f; }
+    .review-text { color: #555; margin-bottom: 12px; line-height: 1.5; }
+    .review-contact { background: #e3f2fd; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
+    .review-contact strong { color: #1976D2; }
+    
+    .review-actions { display: flex; gap: 12px; }
+    .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+    .btn-reply { background: #FF6F00; color: white; }
+    .btn-qr { background: #2E7D32; color: white; }
+    
+    /* Reply form */
+    .reply-form { margin-top: 16px; display: none; }
+    .reply-form.show { display: block; }
+    .reply-form textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; resize: vertical; min-height: 80px; margin-bottom: 12px; }
+    .reply-form .btn { margin-right: 8px; }
+    .reply-form .btn-cancel { background: #eee; color: #333; }
+    
+    /* QR Modal */
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+    .modal.show { display: flex; }
+    .modal-content { background: white; padding: 32px; border-radius: 16px; text-align: center; max-width: 400px; }
+    .modal-content h3 { margin-bottom: 20px; }
+    .modal-content img { max-width: 100%; border-radius: 8px; margin-bottom: 16px; }
+    .modal-content .url { word-break: break-all; font-size: 12px; color: #666; margin-bottom: 20px; }
+    .modal-close { padding: 10px 20px; background: #eee; border: none; border-radius: 8px; cursor: pointer; }
+    
+    /* Empty */
+    .empty { text-align: center; color: #999; padding: 40px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo"><span>+</span> YourFeedback. <span style="color:#666;font-size:14px;">biz</span></div>
+    <div class="user">
+      <span id="business-name">Business</span>
+      <a href="admin-login.html" class="logout">Logout</a>
+    </div>
+  </div>
+  
+  <div class="container">
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Total Reviews</div>
+        <div class="stat-value" id="stat-total">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Rating</div>
+        <div class="stat-value" id="stat-avg">0.0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Response Rate</div>
+        <div class="stat-value" id="stat-response">0%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending Issues</div>
+        <div class="stat-value issues" id="stat-pending">0</div>
+      </div>
+    </div>
+    
+    <!-- Reviews Section -->
+    <div class="section">
+      <h2>Recent Reviews</h2>
+      <div class="tabs">
+        <button class="tab active" onclick="filterReviews('all')">All</button>
+        <button class="tab" onclick="filterReviews('bad')">Issues (1-6)</button>
+        <button class="tab" onclick="filterReviews('neutral')">Neutral (7-8)</button>
+        <button class="tab" onclick="filterReviews('good')">Happy (9-10)</button>
+      </div>
+      <div class="review-list" id="reviews"></div>
+    </div>
+    
+    <!-- QR Codes Section -->
+    <div class="section">
+      <h2>QR Codes</h2>
+      <p style="color:#666;margin-bottom:20px;">Generate QR codes for each location to put on tables/receipts</p>
+      <div class="review-list" id="locations"></div>
+    </div>
+  </div>
+  
+  <!-- QR Modal -->
+  <div class="modal" id="qr-modal">
+    <div class="modal-content">
+      <h3 id="qr-title">QR Code</h3>
+      <img id="qr-image" src="" alt="QR Code">
+      <div class="url" id="qr-url"></div>
+      <button class="modal-close" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    let allReviews = [];
+    let allLocations = [];
+    
+    async function loadDashboard() {
+      const token = localStorage.getItem('business_token');
+      if (!token) { window.location.href = '/admin'; return; }
+      
+      document.getElementById('business-name').textContent = localStorage.getItem('business_name') || 'Business';
+      
+      const res = await fetch('/api/admin/dashboard', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!res.ok) { window.location.href = '/admin'; return; }
+      
+      const data = await res.json();
+      
+      // Stats
+      document.getElementById('stat-total').textContent = data.stats.total_reviews;
+      document.getElementById('stat-avg').textContent = (data.stats.avg_rating || 0).toFixed(1);
+      document.getElementById('stat-response').textContent = Math.round((data.stats.response_rate || 0) * 100) + '%';
+      document.getElementById('stat-pending').textContent = data.stats.pending_issues;
+      
+      allReviews = data.reviews;
+      allLocations = data.locations;
+      
+      renderReviews(allReviews);
+      renderLocations(allLocations);
+    }
+    
+    function renderReviews(reviews) {
+      const container = document.getElementById('reviews');
+      if (reviews.length === 0) {
+        container.innerHTML = '<div class="empty">No reviews yet</div>';
+        return;
+      }
+      
+      container.innerHTML = reviews.map(r => {
+        const ratingClass = r.rating >= 9 ? 'good' : r.rating >= 7 ? 'neutral' : 'bad';
+        const date = new Date(r.created_at).toLocaleDateString();
+        
+        let contactHtml = ''; if (r.contact_requested) {
+          contactHtml = `
+            <div class="review-contact">
+              <strong>📞 Contact requested</strong><br>
+              ${r.contact_name ? 'Name: ' + r.contact_name + '<br>' : ''}
+              ${r.contact_phone ? 'Phone: ' + r.contact_phone + '<br>' : ''}
+              ${r.contact_email ? 'Email: ' + r.contact_email + '<br>' : ''}
+              ${r.service_type ? 'Service: ' + r.service_type : ''}
+            </div>
+          `;
+        }
+        
+        let responseHtml = '';
+        if (r.responded) {
+          responseHtml = `<div style="background:#e8f5e9;padding:12px;border-radius:8px;margin-top:12px;"><strong>Your reply:</strong><br>${r.response_text}</div>`;
+        } else if (r.rating <= 6) {
+          responseHtml = `
+            <div class="reply-form" id="reply-form-${r.id}">
+              <textarea placeholder="Reply to this customer...">${r.response_text || ''}</textarea>
+              <button class="btn btn-reply" onclick="submitReply('${r.id}')">Send Reply</button>
+              <button class="btn btn-cancel" onclick="cancelReply('${r.id}')">Cancel</button>
+            </div>
+          `;
+        }
+        
+        return `
+          <div class="review">
+            <div class="review-header">
+              <div>
+                <div class="review-location">📍 ${r.location_name}</div>
+                <div class="review-date">${date}</div>
+              </div>
+              <div class="review-rating ${ratingClass}">${'⭐'.repeat(Math.round(r.rating / 2))} (${r.rating}/10)</div>
+            </div>
+            ${r.feedback_text ? `<div class="review-text">"${r.feedback_text}"</div>` : ''}
+            ${contactHtml}
+            ${responseHtml}
+            <div class="review-actions">
+              ${!r.responded && r.rating <= 6 ? `<button class="btn btn-reply" onclick="showReplyForm('${r.id}')">Reply</button>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function renderLocations(locations) {
+      const container = document.getElementById('locations');
+      container.innerHTML = locations.map(l => `
+        <div class="review">
+          <div class="review-header">
+            <div class="review-location">📍 ${l.name}</div>
+            <button class="btn btn-qr" onclick="showQR('${l.id}', '${l.name}')">Generate QR</button>
+          </div>
+          ${l.address ? `<div style="color:#666;font-size:14px;">${l.address}</div>` : ''}
+        </div>
+      `).join('');
+    }
+    
+    function filterReviews(filter) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      let filtered = allReviews;
+      if (filter === 'bad') filtered = allReviews.filter(r => r.rating <= 6);
+      else if (filter === 'neutral') filtered = allReviews.filter(r => r.rating >= 7 && r.rating <= 8);
+      else if (filter === 'good') filtered = allReviews.filter(r => r.rating >= 9);
+      
+      renderReviews(filtered);
+    }
+    
+    function showReplyForm(id) {
+      document.getElementById(`reply-form-${id}`).classList.add('show');
+    }
+    
+    function cancelReply(id) {
+      document.getElementById(`reply-form-${id}`).classList.remove('show');
+    }
+    
+    async function submitReply(id) {
+      const textarea = document.querySelector(`#reply-form-${id} textarea`);      const token = localStorage.getItem('business_token');
+      
+      await fetch(`/api/admin/review/${id}/respond`, {        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ response_text: textarea.value })
+      });
+      
+      loadDashboard();
+    }
+    
+    async function showQR(locationId, name) {
+      const token = localStorage.getItem('business_token');
+      const res = await fetch(`/api/admin/location/${locationId}/qr`, {
+        headers: { 'Authorization': `Bearer ${token}` }      });
+      const data = await res.json();
+      
+      document.getElementById('qr-title').textContent = name;
+      document.getElementById('qr-image').src = data.qr;
+      document.getElementById('qr-url').textContent = data.url;
+      document.getElementById('qr-modal').classList.add('show');
+    }
+    
+    function closeModal() {
+      document.getElementById('qr-modal').classList.remove('show');
+    }
+    
+    loadDashboard();
+  </script>
+</body>
+</html>
