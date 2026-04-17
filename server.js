@@ -104,6 +104,7 @@ app.post('/api/feedback', (req, res) => {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(reviewId, business.id, location_id, rating, feedback_text || null, contact_requested ? 1 : 0, contact_name || null, contact_phone || null, contact_email || null, service_type || null);
   
+  console.log('✅ Feedback saved:', { rating, location_id, feedback_text: feedback_text?.substring(0, 50) });
   res.json({ success: true, review_id: reviewId });
 });
 

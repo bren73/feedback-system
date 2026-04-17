@@ -281,7 +281,7 @@
       const contactEmail = document.getElementById('contact-email').value;
       const serviceType = document.getElementById('service-type').value;
       
-      await fetch('/api/feedback', {
+      const resp = await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -296,6 +296,12 @@
           service_type: serviceType
         })
       });
+      const result = await resp.json();
+      if (!resp.ok || !result.success) {
+        console.error('Feedback save failed:', result);
+        alert('Error saving. Please try again.');
+        return;
+      }
       
       // Show appropriate thank you
       if (state.rating >= 9) {
