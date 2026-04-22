@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Local Choice - Feedback</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .container { width: 100%; max-width: 500px; padding: 20px; }
+    .card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); padding: 32px; text-align: center; }
+    .logo { font-size: 24px; font-weight: bold; color: #2E7D32; margin-bottom: 8px; }
+    .logo span { color: #FF6F00; }
+    .tagline { color: #666; font-size: 14px; margin-bottom: 24px; }
+    h2 { color: #333; margin-bottom: 16px; font-size: 20px; }
+    p { color: #666; margin-bottom: 20px; }
+    
+    /* Location buttons */
+    .location-btn { display: block; width: 100%; padding: 16px; margin: 10px 0; background: #FF6F00; color: white; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; transition: transform 0.2s; }
+    .location-btn:hover { transform: scale(1.02); }
+    
+    /* Rating grid */
+    .rating-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
+    .rating-btn { aspect-ratio: 1; border: none; border-radius: 12px; background: #FFE0B2; color: #E65100; font-size: 20px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+    .rating-btn:hover { background: #FF6F00; color: white; transform: scale(1.1); }
+    
+    /* Text input */
+    textarea { width: 100%; padding: 16px; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; resize: vertical; min-height: 100px; margin: 10px 0; }
+    textarea:focus { outline: none; border-color: #FF6F00; }
+    
+    /* Yes/No buttons */
+    .yesno { display: flex; gap: 16px; margin: 20px 0; }
+    .yesno button { flex: 1; padding: 16px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; transition: transform 0.2s; }
+    .yesno .yes { background: #4CAF50; color: white; }
+    .yesno .no { background: #9E9E9E; color: white; }
+    .yesno button:hover { transform: scale(1.02); }
+    
+    /* Form */
+    .form-group { margin-bottom: 16px; text-align: left; }
+    .form-group label { display: block; margin-bottom: 6px; color: #333; font-weight: 500; }
+    .form-group input, .form-group select { width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: #FF6F00; }
+    
+    /* Navigation */
+    .nav { display: flex; gap: 12px; margin-top: 20px; }
+    .nav button { flex: 1; padding: 14px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; }
+    .nav .prev { background: #FFE0B2; color: #E65100; }
+    .nav .next { background: #FF6F00; color: white; }
+    .nav button:hover { opacity: 0.9; }
+    
+    /* Thank you */
+    .thank-you { text-align: center; }
+    .thank-you .icon { font-size: 56px; margin-bottom: 20px; }
+    .google-btn { display: inline-block; padding: 16px 32px; background: #FF6F00; color: white; text-decoration: none; border-radius: 12px; margin-top: 20px; font-weight: bold; font-size: 18px; }
+    
+    /* Hidden */
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="logo"><img src="/assets/logo.jpg" alt="Logo" class="logo-img" style="height:100px;vertical-align:middle;display:block;margin:0 auto 16px;"/></div>
+      <div class="tagline">here for you</div>
+      
+      <!-- Step 1: Location -->
+      <div id="step-location" class="hidden">
+        <h2>Please select your store location</h2>
+        <div id="locations"></div>
+      </div>
+      
+      <!-- Step 2: Rating -->
+      <div id="step-rating" class="hidden">
+        <img src="/assets/logo.jpg" alt="Logo" style="height:180px;display:block;margin:0 auto 16px;"/>
+        <h2>How was your visit today?</h2>
+        <p>Tap a number to rate your experience</p>
+        <div class="rating-grid" id="rating-grid"></div>
+      </div>
+      
+      <!-- Step 3: Feedback (1-6) -->
+      <div id="step-feedback-bad" class="hidden">
+        <img src="/assets/logo.jpg" alt="Logo" style="height:180px;display:block;margin:0 auto 16px;"/>
+        <h2>We're sorry to hear that</h2>
+        <p>What went wrong?</p>
+        <textarea id="feedback-text-bad" placeholder="Tell us what happened..."></textarea>
+        <div class="nav">
+          <button class="prev" onclick="prevStep()">Previous</button>
+          <button class="next" onclick="nextStep('feedback-bad')">Next</button>
+        </div>
+      </div>
+      
+      <!-- Step 3: Feedback (7-8) -->
+      <div id="step-feedback-neutral" class="hidden">
+        <img src="/assets/logo.jpg" alt="Logo" style="height:180px;display:block;margin:0 auto 16px;"/>
+        <h2>Thanks for your feedback!</h2>
+        <p>What could make your experience better?</p>
+        <textarea id="feedback-text-neutral" placeholder="Your suggestions..."></textarea>
+        <div class="nav">
+          <button class="prev" onclick="prevStep()">Previous</button>
+          <button class="next" onclick="nextStep('feedback-neutral')">Next</button>
+        </div>
+      </div>
+      
+      <!-- Step 4: Contact? -->
+      <div id="step-contact" class="hidden">
+        <img src="/assets/logo.jpg" alt="Logo" style="height:180px;display:block;margin:0 auto 16px;"/>
+        <h2 id="contact-question">Would you like the owner to contact you?</h2>
+        <div class="yesno">
+          <button class="yes" onclick="yesContact()">Yes</button>
+          <button class="no" onclick="noContact()">No</button>
+        </div>
+        <div class="nav">
+          <button class="prev" onclick="prevStep()">Previous</button>
+        </div>
+      </div>
+      
+      <!-- Step 5: Contact Form -->
+      <div id="step-contact-form" class="hidden">
+        <img src="/assets/logo.jpg" alt="Logo" style="height:180px;display:block;margin:0 auto 16px;"/>
+        <h2>Your Contact Details</h2>
+        <div class="form-group">
+          <label>Name (optional)</label>
+          <input type="text" id="contact-name" placeholder="Your name">
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="contact-phone" placeholder="Your phone number" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="contact-email" placeholder="Your email" required>
+        </div>
+        <div class="form-group">
+          <label>Service Type</label>
+          <select id="service-type">
+            <option value="">Select service...</option>
+            <option value="Medication - Prescribed">Medication - Prescribed</option>
+            <option value="Medication - Over The Counter">Medication - Over The Counter</option>
+            <option value="Doctor's Visit">Doctor's Visit</option>
+            <option value="Clinic Visit">Clinic Visit</option>
+            <option value="Retail Purchase">Retail Purchase</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="nav">
+          <button class="prev" onclick="prevStep()">Previous</button>
+          <button class="next" onclick="submitFeedback()">Submit</button>
+        </div>
+      </div>
+      
+      <!-- Thank You (1-6 / 7-8 with contact) -->
+      <div id="step-thank-contact" class="hidden">
+        <img src="/assets/logo.jpg" alt="Logo" style="height:180px;display:block;margin:0 auto 16px;"/>
+        <div class="thank-you">
+          <div class="icon" id="contact-icon">📞</div>
+          <h2>Thank you!</h2>
+          <p>The owner will be in touch soon.</p>
+        </div>
+      </div>
+      
+      <!-- Thank You (1-6 no contact) -->
+      <div id="step-thank-nocontact" class="hidden">
+        <img src="/assets/logo.jpg" alt="Logo" style="height:180px;display:block;margin:0 auto 16px;"/>
+        <div class="thank-you">
+          <div class="icon">🙏</div>
+          <h2>Thank you!</h2>
+          <p>Your feedback helps us serve you better.</p>
+        </div>
+      </div>
+      
+      <!-- Thank You (9-10) -->
+      <div id="step-thank-happy" class="hidden">
+        <img src="/assets/logo.jpg" alt="Logo" style="height:180px;display:block;margin:0 auto 16px;"/>
+        <div class="thank-you">
+          <div class="icon" style="font-size:48px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="56" height="56"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg></div>
+          <h2>Awesome! Thanks!</h2>
+          <p>We're thrilled you had a great experience.</p>
+          <a href="#" class="google-btn" id="google-link" target="_blank">Please share your experience on Google</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Get business/location from URL
+    const pathParts = window.location.pathname.split('/').filter(p => p && !p.endsWith('.html'));
+    const locationId = pathParts.length > 0 && pathParts[pathParts.length - 1].length > 5 ? pathParts[pathParts.length - 1] : null;
+    const businessSlug = new URLSearchParams(window.location.search).get('business') || 'the-local-choice';
+    
+    let currentStep = 'location';
+    let state = {
+      locationId: locationId,
+      rating: null,
+      feedbackText: '',
+      contactRequested: false,
+      googleReviewsUrl: ''
+    };
+    
+    const steps = ['location', 'rating', 'feedback', 'contact', 'contact-form', 'thank'];
+    
+    // Load locations on start
+    async function init() {
+      try {
+        const res = await fetch(`/api/${businessSlug || 'the-local-choice'}/locations`);
+        const locations = await res.json();
+        
+        const container = document.getElementById('locations');
+        locations.forEach(loc => {
+          const btn = document.createElement('button');
+          btn.className = 'location-btn';
+          btn.textContent = loc.name;
+          btn.onclick = () => selectLocation(loc.id);
+          container.appendChild(btn);
+        });
+        
+        // If location in URL, skip to rating
+        if (locationId) {
+          state.locationId = locationId;
+          showStep('rating');
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    
+    function selectLocation(id) {
+      state.locationId = id;
+      showStep('rating');
+    }
+    
+    function showStep(step) {
+      document.querySelectorAll('.card > div').forEach(d => d.classList.add('hidden'));
+      
+      if (step === 'location') document.getElementById('step-location').classList.remove('hidden');
+      else if (step === 'rating') document.getElementById('step-rating').classList.remove('hidden');
+      else if (step === 'feedback-bad') document.getElementById('step-feedback-bad').classList.remove('hidden');
+      else if (step === 'feedback-neutral') document.getElementById('step-feedback-neutral').classList.remove('hidden');
+      else if (step === 'contact') {
+        // Update follow-up text based on rating
+        const question = document.getElementById('contact-question');
+        if (state.rating <= 6) {
+          question.textContent = 'Would you like the owner to contact you?';
+        } else {
+          question.textContent = 'Would you like the manager to contact you?';
+        }
+        document.getElementById('step-contact').classList.remove('hidden');
+      }
+      else if (step === 'contact-form') document.getElementById('step-contact-form').classList.remove('hidden');
+      else if (step === 'thank-contact') document.getElementById('step-thank-contact').classList.remove('hidden');
+      else if (step === 'thank-nocontact') document.getElementById('step-thank-nocontact').classList.remove('hidden');
+      else if (step === 'thank-happy') document.getElementById('step-thank-happy').classList.remove('hidden');
+      
+      currentStep = step;
+    }
+    
+    function prevStep() {
+      if (currentStep === 'feedback-bad' || currentStep === 'feedback-neutral') showStep('rating');
+      else if (currentStep === 'contact') showStep(state.rating <= 6 ? 'feedback-bad' : 'feedback-neutral');
+      else if (currentStep === 'contact-form') showStep('contact');
+    }
+    
+    function nextStep(type) {
+      if (type === 'feedback-bad' || type === 'feedback-neutral') {
+        state.feedbackText = document.getElementById('feedback-text-' + type.split('-')[1]).value;
+      }
+      showStep('contact');
+    }
+    
+    function yesContact() {
+      state.contactRequested = true;
+      // Change follow-up message based on rating
+      const question = document.getElementById('contact-question');
+      if (state.rating <= 6) {
+        question.textContent = 'Would you like the owner to contact you?';
+      } else {
+        question.textContent = 'Would you like the manager to follow up?';
+      }
+      showStep('contact-form');
+    }
+    
+    function noContact() {
+      state.contactRequested = false;
+      submitFeedback();
+    }
+    
+    async function submitFeedback() {
+      const contactName = document.getElementById('contact-name').value;
+      const contactPhone = document.getElementById('contact-phone').value;
+      const contactEmail = document.getElementById('contact-email').value;
+      const serviceType = document.getElementById('service-type').value;
+      
+      const resp = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          business_slug: businessSlug || 'the-local-choice',
+          location_id: state.locationId,
+          rating: state.rating,
+          feedback_text: state.feedbackText,
+          contact_requested: state.contactRequested,
+          contact_name: contactName,
+          contact_phone: contactPhone,
+          contact_email: contactEmail,
+          service_type: serviceType
+        })
+      });
+      const result = await resp.json();
+      if (!resp.ok || !result.success) {
+        console.error('Feedback save failed:', result);
+        alert('Error saving. Please try again.');
+        return;
+      }
+      
+      // Show appropriate thank you
+      if (state.rating >= 9) {
+        showStep('thank-happy');
+      } else if (state.contactRequested) {
+        // Update message based on rating
+        const contactThank = document.querySelector('#step-thank-contact p');
+        if (state.rating <= 6) {
+          contactThank.textContent = 'The owner will be in touch soon.';
+        } else {
+          contactThank.textContent = 'The manager will be in touch soon.';
+        }
+        // Update icon based on whether phone was provided
+        const contactIcon = document.getElementById('contact-icon');
+        if (contactPhone && contactPhone.trim().length > 0) {
+          contactIcon.textContent = '📞';
+        } else {
+          contactIcon.textContent = '✉️';
+        }
+        showStep('thank-contact');
+      } else {
+        // Customize message based on whether they typed feedback
+        const noContactThank = document.querySelector('#step-thank-nocontact p');
+        if (state.feedbackText && state.feedbackText.trim().length > 0) {
+          noContactThank.textContent = "Your feedback helps us serve you better.";
+        } else {
+          noContactThank.textContent = "We'd love to hear more about your experience next time.";
+        }
+        showStep('thank-nocontact');
+      }
+    }
+    
+    // Rating buttons
+    const grid = document.getElementById('rating-grid');
+    for (let i = 1; i <= 10; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'rating-btn';
+      btn.textContent = i;
+      btn.onclick = () => selectRating(i);
+      grid.appendChild(btn);
+    }
+    
+    function selectRating(rating) {
+      state.rating = rating;
+      
+      if (rating <= 6) {
+        showStep('feedback-bad');
+      } else if (rating <= 8) {
+        showStep('feedback-neutral');
+      } else {
+        // 9-10: Go straight to thank you (with Google Reviews)
+        submitFeedback();
+      }
+    }
+    
+    init();
+  </script>
+</body>
+</html>
