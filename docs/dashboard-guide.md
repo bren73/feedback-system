@@ -28,7 +28,10 @@ NPS measures customer loyalty by asking: "How likely are you to recommend us?"
 
 | NPS Score | Rating | What it means |
 |-----------|--------|---------------|
-| -100 to 0 | Poor | More unhappy customers than happy ones |
+| -100 to -50 | Critical | Most customers are unhappy — urgent action needed |
+| -49 to -20 | Very Poor | Significant issues to address |
+| -19 to -1 | Poor | More unhappy than happy — focus on improvements |
+| 0 | Low | Balanced — equal promoters and detractors |
 | 1 to 30 | Below Average | Some happy customers, room to improve |
 | 31 to 50 | Good | Healthy business, more promoters than detractors |
 | 51 to 70 | Very Good | Strong customer loyalty |
