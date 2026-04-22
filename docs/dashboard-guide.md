@@ -11,7 +11,7 @@ The total number of customer feedback submissions received across all locations.
 The average rating given by customers. Higher is better.
 - 9-10 = Promoters (loyal fans)
 - 7-8 = Passives (satisfied but not enthusiastic)
-- 0-6 = Detractors (unhappy customers)
+- 1-6 = Detractors (unhappy customers)
 
 ---
 
@@ -21,7 +21,7 @@ NPS measures customer loyalty by asking: "How likely are you to recommend us?"
 
 **How it's calculated:**
 - Count promoters (ratings 9-10)
-- Count detractors (ratings 0-6)
+- Count detractors (ratings 1-6)
 - **NPS = % Promoters − % Detractors**
 
 **Score ranges from -100 to +100:**

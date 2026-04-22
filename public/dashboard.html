@@ -548,6 +548,55 @@
       document.getElementById('help-modal').classList.add('show');
     }
     
+    function showDashboardGuide() {
+      const guideHtml = `<div style="max-height:400px;overflow-y:auto;">
+        <h4 style="margin-top:0;">Total Reviews</h4>
+        <p>The total number of customer feedback submissions received across all locations.</p>
+        
+        <h4>Average Rating (1-10)</h4>
+        <p>The average rating given by customers. Higher is better.</p>
+        <ul>
+          <li><strong>9-10</strong> = Promoters (loyal fans)</li>
+          <li><strong>7-8</strong> = Passives (satisfied but not enthusiastic)</li>
+          <li><strong>1-6</strong> = Detractors (unhappy customers)</li>
+        </ul>
+        
+        <h4>Net Promoter Score (NPS)</h4>
+        <p>NPS measures customer loyalty by asking: "How likely are you to recommend us?"</p>
+        <p><strong>How it is calculated:</strong></p>
+        <ul>
+          <li>Count promoters (ratings 9-10)</li>
+          <li>Count detractors (ratings 1-6)</li>
+          <li><strong>NPS = % Promoters - % Detractors</strong></li>
+        </ul>
+        <p><strong>Score ranges from -100 to +100:</strong></p>
+        <table style="width:100%;font-size:12px;border-collapse:collapse;">
+          <tr style="background:#eee;"><th style="padding:8px;text-align:left;">Score</th><th style="padding:8px;text-align:left;">Rating</th><th style="padding:8px;text-align:left;">What it means</th></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #eee;">-100 to -50</td><td style="padding:8px;border-bottom:1px solid #eee;">Critical</td><td style="padding:8px;border-bottom:1px solid #eee;">Most customers are unhappy - urgent action needed</td></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #eee;">-49 to -20</td><td style="padding:8px;border-bottom:1px solid #eee;">Very Poor</td><td style="padding:8px;border-bottom:1px solid #eee;">Significant issues to address</td></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #eee;">-19 to -1</td><td style="padding:8px;border-bottom:1px solid #eee;">Poor</td><td style="padding:8px;border-bottom:1px solid #eee;">More unhappy than happy - focus on improvements</td></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #eee;">0</td><td style="padding:8px;border-bottom:1px solid #eee;">Low</td><td style="padding:8px;border-bottom:1px solid #eee;">Balanced - equal promoters and detractors</td></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #eee;">1 to 30</td><td style="padding:8px;border-bottom:1px solid #eee;">Below Average</td><td style="padding:8px;border-bottom:1px solid #eee;">Some happy customers, room to improve</td></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #eee;">31 to 50</td><td style="padding:8px;border-bottom:1px solid #eee;">Good</td><td style="padding:8px;border-bottom:1px solid #eee;">Healthy business, more promoters than detractors</td></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #eee;">51 to 70</td><td style="padding:8px;border-bottom:1px solid #eee;">Very Good</td><td style="padding:8px;border-bottom:1px solid #eee;">Strong customer loyalty</td></tr>
+          <tr><td style="padding:8px;">71 to 100</td><td style="padding:8px;">Excellent</td><td style="padding:8px;">World-class (very rare)</td></tr>
+        </table>
+        
+        <h4>Pending Issues</h4>
+        <p>Number of negative reviews (1-6 rating) that have not been responded to yet. These need your attention!</p>
+        
+        <h4>Quick Wins</h4>
+        <ol>
+          <li><strong>Respond to pending issues</strong> - every response shows you care</li>
+          <li><strong>Ask happy customers to leave Google reviews</strong> - boosts your online reputation</li>
+          <li><strong>Follow up with detractors</strong> - turn a bad experience into a good one</li>
+        </ol>
+      </div>`;
+      document.getElementById("help-content").innerHTML = guideHtml;
+      document.getElementById("help-modal").classList.add("show");
+      document.querySelector("#help-modal h3").textContent = "Dashboard Guide";
+    }
+    
     function showReplyForm(id) {
       document.getElementById('reply-form-' + id).classList.add('show');
     }
@@ -571,5 +620,9 @@
     
     window.onload = loadDashboard;
   </script>
+  <div style="text-align:center;padding:20px;color:#666;font-size:12px;border-top:1px solid #eee;margin-top:40px;">
+    <a href="#" onclick="showDashboardGuide()" style="color:#FF6F00;text-decoration:none;margin-right:20px;">Dashboard Guide</a>
+    <span>Powered by MPEC</span>
+  </div>
 </body>
 </html>
