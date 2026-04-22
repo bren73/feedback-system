@@ -20,6 +20,7 @@
     .stat-card { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     .stat-label { color: #666; font-size: 14px; margin-bottom: 8px; }
     .stat-value { font-size: 32px; font-weight: bold; color: #333; }
+    .stat-value.nps { color: #FF6F00; }
     .stat-value.issues { color: #d32f2f; }
     .stat-value.good { color: #4CAF50; }
     
@@ -186,7 +187,7 @@
       <button class="modal-close" onclick="closeHelp()">Close</button>
     </div>
   </div>
-        <div class="stat-value" id="stat-nps" style="display:none;">0</div>
+        <div class="stat-value" id="stat-nps" class="stat-value nps" style="display:none;">0</div>
 
   <!-- Help Modal -->
   <div class="modal" id="help-modal">
@@ -387,7 +388,7 @@
       <button class="modal-close" onclick="closeHelp()">Close</button>
     </div>
   </div>
-              <div class="stat-card"><div class="stat-label">Net Promoter Score</div><div class="stat-value" id="stat-nps-${loc.id}">${nps}</div></div>
+              <div class="stat-card"><div class="stat-label">Net Promoter Score</div><div class="stat-value" id="stat-nps-${loc.id}" class="stat-value nps">${nps}</div></div>
 
   <!-- Help Modal -->
   <div class="modal" id="help-modal">
