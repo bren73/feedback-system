@@ -68,11 +68,6 @@ For negative reviews with contact details, you can reply directly from the dashb
 - Happy customers refer friends
 - Addressing issues turns detractors into promoters
 
-**Your current score: 25** (Below Average → Good)
-- You have promoters who love you
-- There are some unhappy customers — reach out to them!
-- Responding to issues can quickly improve your score
-
 ---
 
 ## Quick Wins
@@ -80,6 +75,10 @@ For negative reviews with contact details, you can reply directly from the dashb
 1. **Respond to pending issues** — every response shows you care
 2. **Ask happy customers to leave Google reviews** — boosts your online reputation
 3. **Follow up with detractors** — turn a bad experience into a good one
+
+---
+
+*Click the "Help" button on your dashboard to see your specific scores and recommendations per location.*
 
 ---
 
