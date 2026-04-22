@@ -25,7 +25,9 @@
     
     /* Section */
     .section { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); padding: 24px; margin-bottom: 24px; }
-    .section h2 { margin-bottom: 20px; color: #333; }
+    .section h2 { margin-bottom: 20px; color: #333; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .section h2 .toggle { font-size: 18px; transition: transform 0.2s; }
+    .section h2 .toggle.collapsed { transform: rotate(-90deg); }
     
     /* Tabs */
     .tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
@@ -173,14 +175,14 @@
 
         const sectionHTML = `
           <div class="section">
-            <h2>${loc.name}</h2>
+            <h2 onclick="toggleSection('${loc.id}')">${loc.name} <span class="toggle" id="toggle-${loc.id}">▼</span></h2>
             <div class="stats">
               <div class="stat-card"><div class="stat-label">Total Reviews</div><div class="stat-value" id="stat-total-${loc.id}">${total}</div></div>
               <div class="stat-card"><div class="stat-label">Avg Rating</div><div class="stat-value" id="stat-avg-${loc.id}">${avg}</div></div>
               <div class="stat-card"><div class="stat-label">Net Promoter Score</div><div class="stat-value" id="stat-nps-${loc.id}">${nps}</div></div>
               <div class="stat-card"><div class="stat-label">Pending Issues</div><div class="stat-value issues" id="stat-pending-${loc.id}">${pending}</div></div>
             </div>
-            <div class="review-list" id="reviews-${loc.id}"></div>
+            <div class="review-list" id="reviews-${loc.id}" style="display:block;"></div>
             <div class="review-list" id="qr-${loc.id}"></div>
           </div>`;
         const wrapper = document.createElement('div');
@@ -217,7 +219,19 @@
       });
     }
     
-    function closeModal() {
+    function toggleSection(locId) {
+      const reviewsDiv = document.getElementById("reviews-" + locId);
+      const toggle = document.getElementById("toggle-" + locId);
+      if (reviewsDiv.style.display === "none") {
+        reviewsDiv.style.display = "block";
+        toggle.classList.remove("collapsed");
+      } else {
+        reviewsDiv.style.display = "none";
+        toggle.classList.add("collapsed");
+      }
+    }
+    
+    function closeModal() { {
       document.getElementById('qr-modal').classList.remove('show');
     }
     
