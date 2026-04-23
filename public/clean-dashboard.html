@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - YourFeedback</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    .header { background: white; padding: 16px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 20px; font-weight: bold; color: #2E7D32; }
+    .logo span { color: #FF6F00; }
+    .user { color: #666; }
+    .logout { color: #FF6F00; text-decoration: none; margin-left: 16px; }
+    
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .stat-card { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .stat-label { color: #666; font-size: 14px; margin-bottom: 8px; }
+    .stat-value { font-size: 32px; font-weight: bold; color: #333; }
+    .stat-value.nps { color: #FF6F00; }
+    .stat-value.issues { color: #d32f2f; }
+    .stat-value.good { color: #4CAF50; }
+    
+    /* Section */
+    .section { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); padding: 24px; margin-bottom: 24px; }
+    .section h2 { margin-bottom: 20px; color: #333; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .section h2 .toggle { font-size: 18px; transition: transform 0.2s; }
+    .section h2 .toggle.collapsed { transform: rotate(-90deg); }
+    
+    /* Tabs */
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
+    .tab { padding: 10px 20px; background: none; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; color: #666; }
+    .tab.active { background: #FF6F00; color: white; }
+    
+    /* Reviews */
+    .review-list { display: flex; flex-direction: column; gap: 16px; }
+    .review { border: 1px solid #eee; border-radius: 12px; padding: 20px; }
+    .review-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .review-location { font-weight: 600; color: #333; }
+    .review-date { color: #999; font-size: 14px; }
+    .review-rating { font-size: 20px; }
+    .review-rating.good { color: #4CAF50; }
+    .review-rating.neutral { color: #FF9800; }
+    .review-rating.bad { color: #d32f2f; }
+    .review-text { color: #555; margin-bottom: 12px; line-height: 1.5; }
+    .review-contact { background: #e3f2fd; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
+    .review-contact strong { color: #1976D2; }
+    
+    .review-actions { display: flex; gap: 12px; }
+    .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+    .btn-reply { background: #FF6F00; color: white; }
+    .btn-qr { background: #2E7D32; color: white; }
+    
+    /* Reply form */
+    .reply-form { margin-top: 16px; display: none; }
+    .reply-form.show { display: block; }
+    .reply-form textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; resize: vertical; min-height: 80px; margin-bottom: 12px; }
+    .reply-form .btn { margin-right: 8px; }
+    .reply-form .btn-cancel { background: #eee; color: #333; }
+    
+    /* QR Modal */
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+    .modal.show { display: flex; }
+    .modal-content { background: white; padding: 32px; border-radius: 16px; text-align: center; max-width: 400px; }
+    .modal-content h3 { margin-bottom: 20px; }
+    .modal-content img { max-width: 100%; border-radius: 8px; margin-bottom: 16px; }
+    .modal-content .url { word-break: break-all; font-size: 12px; color: #666; margin-bottom: 20px; }
+    .modal-close { padding: 10px 20px; background: #eee; border: none; border-radius: 8px; cursor: pointer; }
+    
+    /* Empty */
+    .empty { text-align: center; color: #999; padding: 40px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo"><img src="assets/logo.jpg" alt="Logo" class="logo-img" style="height:100px;vertical-align:middle;margin-right:8px;"/></div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+    <div class="user">
+      <span id="business-name">Business</span>
+      <a href="#" class="logout" onclick="showHelp()">NPS</a>
+      <a href="#" class="logout" onclick="showDashboardGuide()">Dashboard Guide</a>
+      <a href="admin-login.html" class="logout">Logout</a>
+    </div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+  
+  <div class="container">
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Total Reviews</div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+        <div class="stat-value" id="stat-total" style="display:none;">0</div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+      </div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Rating</div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+        <div class="stat-value" id="stat-avg" style="display:none;">0.0</div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+      </div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+      <div class="stat-card">
+        <div class="stat-label">Net Promoter Score</div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+        <div class="stat-value" id="stat-nps" class="stat-value nps" style="display:none;">0</div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+      </div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending Issues</div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+        <div class="stat-value issues" id="stat-pending" style="display:none;">0</div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+      </div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+    </div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+    
+    <!-- Reviews Section -->
+    <div id="location-sections"></div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+    
+
+  </div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+  
+  <!-- QR Modal -->
+  <div class="modal" id="qr-modal">
+    <div class="modal-content">
+      <h3 id="qr-title">QR Code</h3>
+      <img id="qr-image" src="" alt="QR Code">
+      <div class="url" id="qr-url"></div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+      <button class="modal-close" onclick="closeModal()">Close</button>
+    </div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    let allReviews = [];
+    let allLocations = [];
+    
+    async function loadDashboard() {
+      const token = localStorage.getItem('business_token');
+      console.log('Token:', token);
+      if (!token) { window.location.href = '/admin'; return; }
+      
+      document.getElementById('business-name').textContent = localStorage.getItem('business_name') || 'Business';
+      
+      console.log('Fetching dashboard...');
+      const res = await fetch('/api/admin/dashboard', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      console.log('Response status:', res.status);
+      if (!res.ok) { window.location.href = '/admin'; return; }
+      
+      const data = await res.json();
+      console.log('Dashboard data:', data);
+      
+      // Stats
+      document.getElementById('stat-total').textContent = data.stats?.total_reviews ?? 0;
+      document.getElementById('stat-avg').textContent = (data.stats?.avg_rating || 0).toFixed(1);
+      document.getElementById('stat-nps').textContent = data.stats?.nps ?? 0;
+      document.getElementById('stat-pending').textContent = data.stats?.pending_issues ?? 0;
+      
+      allReviews = data.reviews || [];
+      allLocations = data.locations || [];
+      
+      renderLocationSections();
+      
+      // Show stats after loading
+      document.getElementById("stat-total").style.display = "block";
+      document.getElementById("stat-avg").style.display = "block";
+      document.getElementById("stat-nps").style.display = "block";
+      document.getElementById("stat-pending").style.display = "block";
+    }
+    
+    function renderLocationSections() {
+      const container = document.getElementById('location-sections');
+      container.innerHTML = '';
+      allLocations.forEach(loc => {
+        const locReviews = allReviews.filter(r => r.location_id === loc.id);
+        const total = locReviews.length;
+        const avg = total ? (locReviews.reduce((sum, r) => sum + r.rating, 0) / total).toFixed(1) : 0;
+        const responded = locReviews.filter(r => r.responded).length;
+        const responseRate = total ? Math.round((responded / total) * 100) : 0;
+        const pending = locReviews.filter(r => r.rating <= 6 && !r.responded).length;
+        const promoters = locReviews.filter(r => r.rating >= 9).length;
+        const detractors = locReviews.filter(r => r.rating <= 6).length;
+        const nps = total ? Math.round(((promoters - detractors) / total) * 100) : 0;
+
+        const sectionHTML = `
+          <div class="section">
+            <h2 onclick="toggleSection('${loc.id}')">${loc.name} <span class="toggle" id="toggle-${loc.id}">▼</span></h2>
+            <button class="btn btn-qr" onclick="showQR('${loc.id}')" style="font-size:12px;padding:6px 12px;margin-left:auto;">Show QR</button>
+            <div class="stats">
+              <div class="stat-card"><div class="stat-label">Total Reviews</div><div class="stat-value" id="stat-total-${loc.id}">${total}</div></div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+              <div class="stat-card"><div class="stat-label">Avg Rating</div><div class="stat-value" id="stat-avg-${loc.id}">${avg}</div></div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+              <div class="stat-card"><div class="stat-label">Net Promoter Score</div><div class="stat-value" id="stat-nps-${loc.id}" class="stat-value nps">${nps}</div></div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+              <div class="stat-card"><div class="stat-label">Pending Issues</div><div class="stat-value issues" id="stat-pending-${loc.id}">${pending}</div></div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+            </div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+            <div class="review-list" id="reviews-${loc.id}" style="display:block;"></div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+            <div class="review-list" id="qr-${loc.id}"></div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+          </div>`;
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = sectionHTML;
+        container.appendChild(wrapper);
+        
+        // Render individual reviews
+        const reviewsContainer = document.getElementById(`reviews-${loc.id}`);
+        locReviews.forEach(r => {
+          const date = new Date(r.created_at).toString().replace('GMT+0200 (South Africa Standard Time)', 'SAST');
+          const ratingClass = r.rating >= 9 ? 'good' : (r.rating >= 7 ? 'neutral' : 'bad');
+          let contactHtml = '';
+          if (r.contact_requested) {
+            contactHtml = `<div class="review-contact">Contact requested: ${r.contact_name || 'N/A'} ${r.contact_phone ? '| Phone: ' + r.contact_phone : ''} ${r.contact_email ? '| Email: ' + r.contact_email : ''}</div>`;
+          }
+          let responseHtml = '';
+          if (r.responded) {
+            responseHtml = `<div style="background:#e8f5e9;padding:12px;border-radius:8px;margin-top:12px;"><strong>Your reply:</strong><br>${r.response_text}</div>`;
+          } else if (r.rating <= 8 && r.contact_requested && r.contact_email) {
+            responseHtml = `<button class="btn btn-reply" onclick="showReplyForm('${r.id}')">Reply</button><div class="reply-form" id="reply-form-${r.id}"><textarea placeholder="Reply to this customer...">${r.response_text || ''}</textarea><button class="btn btn-reply" onclick="submitReply('${r.id}')">Send Reply</button><button class="btn btn-cancel" onclick="cancelReply('${r.id}')">Cancel</button></div>`;
+          }
+          const reviewEl = document.createElement('div');
+          reviewEl.className = 'review';
+          reviewEl.innerHTML = `
+            <div class="review-header">
+              <div class="review-location">${date}</div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+              <div class="review-rating ${ratingClass}">Rating: ${r.rating}</div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+            </div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content" style="max-width:500px;text-align:left;">
+      <h3>NPS Guide</h3>
+      <div id="help-content"></div>
+      <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+  </div>
+            ${r.feedback_text ? `<div class="review-text">${r.feedback_text}</div>` : ''}
+            ${contactHtml}
+            ${responseHtml}`;
+          reviewsContainer.appendChild(reviewEl);
+        });
+      });
+    }
+    
+    function toggleSection(locId) {
+      const reviewsDiv = document.getElementById("reviews-" + locId);
+      const toggle = document.getElementById("toggle-" + locId);
+      if (reviewsDiv.style.display === "none") {
+        reviewsDiv.style.display = "block";
+        toggle.classList.remove("collapsed");
+      } else {
+        reviewsDiv.style.display = "none";
+        toggle.classList.add("collapsed");
+      }
+    }
+    
+    function closeModal() {
+      document.getElementById('qr-modal').classList.remove('show');
+    }
+    
+    function closeHelp() {
+      document.getElementById('help-modal').classList.remove('show');
+    }
+    
+    async function showQR(locId) {
+      const token = localStorage.getItem('business_token');
+      const location = allLocations.find(l => l.id === locId);
+      document.getElementById('qr-title').textContent = location?.name + ' QR Code';
+      document.getElementById('qr-url').textContent = window.location.origin + '/r/' + location?.slug + '/' + locId;
+      document.getElementById('qr-image').src = '/api/admin/location/' + locId + '/qr?token=' + token;
+      document.getElementById('qr-modal').classList.add('show');
+    }
+    
+    function showHelp() {
+      let html = '';
+      allLocations.forEach(loc => {
+        const locReviews = allReviews.filter(r => r.location_id === loc.id);
+        const total = locReviews.length;
+        const promoters = locReviews.filter(r => r.rating >= 9).length;
+        const detractors = locReviews.filter(r => r.rating <= 6).length;
+        const nps = total > 0 ? Math.round(((promoters - detractors) / total) * 100) : 0;
+        
+        let rating, advice;
+        if (nps >= 51) { rating = 'Very Good'; advice = 'Excellent! Keep up the great work and encourage happy customers to leave Google reviews.'; }
+        else if (nps >= 31) { rating = 'Good'; advice = 'Healthy score. Focus on maintaining this and addressing any issues quickly.'; }
+        else if (nps >= 1) { rating = 'Below Average'; advice = 'You have happy customers but also some unhappy ones. Respond to all pending issues and ask happy customers for Google reviews.'; }
+        else if (nps >= -19) { rating = 'Poor'; advice = 'More unhappy than happy customers. Urgent action needed - contact unhappy customers and resolve their issues.'; }
+        else if (nps >= -50) { rating = 'Very Poor'; advice = 'Critical situation. Review all negative feedback and reach out to every unhappy customer.'; }
+        else { rating = 'Critical'; advice = 'Most customers are unhappy. Immediate review of service quality and customer contact needed.'; }
+        
+        html += '<div style="background:#f5f5f5;padding:16px;border-radius:8px;margin-bottom:16px;">';
+        html += '<h4 style="margin:0 0 8px;">' + loc.name + '</h4>';
+        html += '<p><strong style="color:#FF6F00;">NPS: ' + nps + '</strong> (' + rating + ')</p>';
+        html += '<p style="color:#666;">' + advice + '</p>';
+        html += '</div>';
+      });
+      
+      document.getElementById('help-content').innerHTML = html;
+      document.getElementById('help-modal').classList.add('show');
+    }
+    
+    function showDashboardGuide() {
+      const guideHtml = `<div style="max-height:400px;overflow-y:auto;">
+        <h4 style="margin-top:0;">Total Reviews</h4>
+        <p>The total number of customer feedback submissions received across all locations.</p>
+        
+        <h4>Average Rating (1-10)</h4>
+        <p>The average rating given by customers. Higher is better.</p>
+        <ul>
+          <li><strong>9-10</strong> = Promoters (loyal fans)</li>
+          <li><strong>7-8</strong> = Passives (satisfied but not enthusiastic)</li>
+          <li><strong>1-6</strong> = Detractors (unhappy customers)</li>
+        </ul>
+        
+        <h4>Net Promoter Score (NPS)</h4>
+        <p>NPS measures customer loyalty by asking: "How likely are you to recommend us?"</p>
+        <p><strong>How it is calculated:</strong></p>
+        <ul>
+          <li>Count promoters (ratings 9-10)</li>
+          <li>Count detractors (ratings 1-6)</li>
+          <li><strong>NPS = % Promoters - % Detractors</strong></li>
+        </ul>
+        <p><strong>Score ranges from -100 to +100:</strong></p>
+        <table style="width:100%;font-size:12px;border-collapse:collapse;">
+          <tr style="background:#eee;"><th style="padding:8px;text-align:left;">Score</th><th style="padding:8px;text-align:left;">Rating</th><th style="padding:8px;text-align:left;">What it means</th></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #eee;">-100 to -50</td><td style="padding:8px;border-bottom:1px solid #eee;">Critical</td><td style="padding:8px;border-bottom:1px solid #eee;">Most customers are unhappy - urgent action needed</td></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #eee;">-49 to -20</td><td style="padding:8px;border-bottom:1px solid #eee;">Very Poor</td><td style="padding:8px;border-bottom:1px solid #eee;">Significant issues to address</td></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #eee;">-19 to -1</td><td style="padding:8px;border-bottom:1px solid #eee;">Poor</td><td style="padding:8px;border-bottom:1px solid #eee;">More unhappy than happy - focus on improvements</td></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #eee;">0</td><td style="padding:8px;border-bottom:1px solid #eee;">Low</td><td style="padding:8px;border-bottom:1px solid #eee;">Balanced - equal promoters and detractors</td></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #eee;">1 to 30</td><td style="padding:8px;border-bottom:1px solid #eee;">Below Average</td><td style="padding:8px;border-bottom:1px solid #eee;">Some happy customers, room to improve</td></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #eee;">31 to 50</td><td style="padding:8px;border-bottom:1px solid #eee;">Good</td><td style="padding:8px;border-bottom:1px solid #eee;">Healthy business, more promoters than detractors</td></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #eee;">51 to 70</td><td style="padding:8px;border-bottom:1px solid #eee;">Very Good</td><td style="padding:8px;border-bottom:1px solid #eee;">Strong customer loyalty</td></tr>
+          <tr><td style="padding:8px;">71 to 100</td><td style="padding:8px;">Excellent</td><td style="padding:8px;">World-class (very rare)</td></tr>
+        </table>
+        
+        <h4>Pending Issues</h4>
+        <p>Number of negative reviews (1-6 rating) that have not been responded to yet. These need your attention!</p>
+        
+        <h4>Quick Wins</h4>
+        <ol>
+          <li><strong>Respond to pending issues</strong> - every response shows you care</li>
+          <li><strong>Ask happy customers to leave Google reviews</strong> - boosts your online reputation</li>
+          <li><strong>Follow up with detractors</strong> - turn a bad experience into a good one</li>
+        </ol>
+      </div>`;
+      document.getElementById("help-content").innerHTML = guideHtml;
+      document.getElementById("help-modal").classList.add("show");
+      document.querySelector("#help-modal h3").textContent = "Dashboard Guide";
+    }
+    
+    function showReplyForm(id) {
+      document.getElementById('reply-form-' + id).classList.add('show');
+    }
+    
+    function cancelReply(id) {
+      document.getElementById('reply-form-' + id).classList.remove('show');
+    }
+    
+    async function submitReply(id) {
+      const textarea = document.querySelector('#reply-form-' + id + ' textarea');
+      const token = localStorage.getItem('business_token');
+      const res = await fetch('/api/admin/review/' + id + '/respond', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ response_text: textarea.value })
+      });
+      if (res.ok) {
+        location.reload();
+      }
+    }
+    
+    window.onload = loadDashboard;
+  </script>
+  <div style="text-align:center;padding:20px;color:#666;font-size:12px;border-top:1px solid #eee;margin-top:40px;">
+    
+    <span>Powered by <a href="https://mypano.net" target="_blank" style="color:#FF6F00;text-decoration:none;">mypano.net</a></span>
+  </div>
+</body>
+</html>
