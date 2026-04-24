@@ -211,7 +211,7 @@ app.get('/api/admin/dashboard', async (req, res) => {
       
     `, [business_id]);
     // Locations for QR
-    const { rows: locations } = await client.query('SELECT * FROM locations WHERE business_id = $1', [business_id]);
+    const { rows: locations } = await client.query('SELECT l.*, b.slug FROM locations l JOIN businesses b ON l.business_id = b.id WHERE l.business_id = $1', [business_id]);
     res.json({ stats, reviews, locations });
   } finally {
     client.release();
