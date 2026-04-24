@@ -367,7 +367,7 @@
 
         const sectionHTML = `
           <div class="section">
-            <h2 onclick="toggleSection('${loc.id}')">${loc.name} <span class="toggle" id="toggle-${loc.id}">▼</span></h2>
+            <h2 onclick="toggleSection('${loc.id}')">${loc.name} <span class="toggle" id="toggle-${loc.id}">▼</span></h2><button class="btn btn-qr" onclick="showQR('${loc.id}')" style="font-size:12px;padding:6px 12px;margin-left:auto;">Show QR</button>
             <button class="btn btn-qr" onclick="showQR('${loc.id}')" style="font-size:12px;padding:6px 12px;margin-left:auto;">Show QR</button>
             <div class="stats">
               <div class="stat-card"><div class="stat-label">Total Reviews</div><div class="stat-value" id="stat-total-${loc.id}">${total}</div></div>
