@@ -236,7 +236,7 @@ app.post('/api/admin/review/:id/respond', async (req, res) => {
 
 // Generate QR code for a location
 app.get('/api/admin/location/:id/qr', async (req, res) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
+  const token = req.headers.authorization?.replace('Bearer ', '') || req.query.token;
   if (!token) return res.status(401).json({ error: 'Unauthorized' });
   const client = await pool.connect();
   try {
