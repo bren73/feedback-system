@@ -245,7 +245,10 @@ app.get('/api/admin/location/:id/qr', async (req, res) => {
     const location = rows[0];
     const baseUrl = `${req.protocol}://${req.get('host')}/r/${location.slug}/${location.id}`;
     const qrDataUrl = await QRCode.toDataURL(baseUrl);
-    res.json({ qr: qrDataUrl, url: baseUrl });
+    // Return as PNG image
+    const base64Data = qrDataUrl.replace(/^data:image\/png;base64,/, '');
+    res.set('Content-Type', 'image/png');
+    res.send(Buffer.from(base64Data, 'base64'));
   } finally {
     client.release();
   }
