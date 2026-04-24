@@ -323,7 +323,7 @@
       console.log('Token:', token);
       if (!token) { window.location.href = '/admin'; return; }
       
-      document.getElementById('business-name').textContent = localStorage.getItem('business_name') || 'Business';
+      // Business name removed
       
       console.log('Fetching dashboard...');
       const res = await fetch('/api/admin/dashboard', {
