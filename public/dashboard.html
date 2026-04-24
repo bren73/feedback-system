@@ -527,7 +527,7 @@
       const location = allLocations.find(l => l.id === locId);
       document.getElementById('qr-title').textContent = location?.name + ' QR Code';
       document.getElementById('qr-url').textContent = window.location.origin + '/r/' + location?.slug + '/' + locId;
-      document.getElementById('qr-image').src = '/api/admin/location/' + locId + '/qr?token=' + token;
+      document.getElementById('qr-image').src = '/api/admin/location/' + locId + '/qr';
       document.getElementById('qr-modal').classList.add('show');
     }
     
