@@ -52,7 +52,8 @@
     .review-actions { display: flex; gap: 12px; }
     .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
     .btn-reply { background: #FF6F00; color: white; }
-    .btn-qr { background: #2E7D32; color: white; }
+    .btn-qr { background: #2E7D32; margin-left: 12px; color: white; }
+    .btn-copy { background: #FF6F00; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
     
     /* Reply form */
     .reply-form { margin-top: 16px; display: none; }
@@ -67,6 +68,7 @@
     .modal-content { background: white; padding: 32px; border-radius: 16px; text-align: center; max-width: 400px; }
     .modal-content h3 { margin-bottom: 20px; }
     .modal-content img { max-width: 100%; border-radius: 8px; margin-bottom: 16px; }
+    /* URL in QR modal */
     .modal-content .url { word-break: break-all; font-size: 12px; color: #666; margin-bottom: 20px; }
     .modal-close { padding: 10px 20px; background: #eee; border: none; border-radius: 8px; cursor: pointer; }
     
@@ -280,8 +282,10 @@
       <h3 id="qr-title">QR Code</h3>
       <img id="qr-image" src="" alt="QR Code">
       <div class="url" id="qr-url"></div>
-
-  <!-- Help Modal -->
+      <button class="btn btn-copy" onclick="copyQRUrl()" style="margin-top:12px;">Copy Link</button>
+      <button class="modal-close" onclick="closeQR()">Close</button>
+    </div>
+  </div>
   <div class="modal" id="help-modal">
     <div class="modal-content" style="max-width:500px;text-align:left;">
       <h3>NPS Guide</h3>
@@ -522,6 +526,17 @@
       document.getElementById('help-modal').classList.remove('show');
     }
     
+    function closeQR() {
+      document.getElementById('qr-modal').classList.remove('show');
+    }
+    
+    function copyQRUrl() {
+      const url = document.getElementById('qr-url').textContent;
+      navigator.clipboard.writeText(url).then(() => {
+        alert('Link copied to clipboard!');
+      });
+    }
+    
     async function showQR(locId) {
       const token = localStorage.getItem('business_token');
       const location = allLocations.find(l => l.id === locId);
@@ -602,6 +617,17 @@
           <li><strong>Ask happy customers to leave Google reviews</strong> - boosts your online reputation</li>
           <li><strong>Follow up with detractors</strong> - turn a bad experience into a good one</li>
         </ol>
+        
+        <h4>QR Codes</h4>
+        <p>Each location has a unique QR code that customers can scan to give feedback. You can find the "Show QR Code" button next to each location name in the dashboard.</p>
+        <p><strong>How to use:</strong></p>
+        <ol>
+          <li>Click "Show QR Code" next to any location</li>
+          <li>The QR code displays - customers can scan it with their phone camera</li>
+          <li>Click "Copy Link" to copy the feedback URL to your clipboard</li>
+          <li>Paste the link in WhatsApp, email, or any channel to share with customers</li>
+        </ol>
+        <p><strong>Print tips:</strong> Screenshot the QR code and print it as a poster or sticker for your storefront.</p>
       </div>`;
       document.getElementById("help-content").innerHTML = guideHtml;
       document.getElementById("help-modal").classList.add("show");
