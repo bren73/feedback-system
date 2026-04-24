@@ -368,6 +368,7 @@
         const sectionHTML = `
           <div class="section">
             <h2 onclick="toggleSection('${loc.id}')">${loc.name} <span class="toggle" id="toggle-${loc.id}">▼</span></h2>
+            <button class="btn btn-qr" onclick="showQR('${loc.id}')" style="font-size:12px;padding:6px 12px;margin-left:auto;">Show QR</button>
             <div class="stats">
               <div class="stat-card"><div class="stat-label">Total Reviews</div><div class="stat-value" id="stat-total-${loc.id}">${total}</div></div>
 
@@ -519,6 +520,15 @@
     
     function closeHelp() {
       document.getElementById('help-modal').classList.remove('show');
+    }
+    
+    async function showQR(locId) {
+      const token = localStorage.getItem('business_token');
+      const location = allLocations.find(l => l.id === locId);
+      document.getElementById('qr-title').textContent = location?.name + ' QR Code';
+      document.getElementById('qr-url').textContent = window.location.origin + '/r/' + location?.slug + '/' + locId;
+      document.getElementById('qr-image').src = '/api/admin/location/' + locId + '/qr?token=' + token;
+      document.getElementById('qr-modal').classList.add('show');
     }
     
     function showHelp() {
