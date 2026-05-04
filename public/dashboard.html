@@ -25,7 +25,11 @@
     
     /* Section */
     .section { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); padding: 24px; margin-bottom: 24px; }
-    .section h2 { margin-bottom: 20px; color: #333; }
+    .section h2 { margin-bottom: 20px; color: #333; display: flex; justify-content: space-between; align-items: center; }
+    .collapse-btn { cursor: pointer; font-size: 18px; color: #666; padding: 5px; }
+    .collapse-btn:hover { color: #FF6F00; }
+    .section-content { margin-top: 20px; }
+    .section-content.collapsed { display: none; }
     
     /* Tabs */
     .tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
@@ -173,7 +177,8 @@
 
         const sectionHTML = `
           <div class="section">
-            <h2>${loc.name}</h2>
+            <h2>${loc.name} <span class="collapse-btn" onclick="toggleSection(this)">▼</span></h2>
+            <div class="section-content">
             <div class="stats">
               <div class="stat-card"><div class="stat-label">Total Reviews</div><div class="stat-value" id="stat-total-${loc.id}">${total}</div></div>
               <div class="stat-card"><div class="stat-label">Avg Rating</div><div class="stat-value" id="stat-avg-${loc.id}">${avg}</div></div>
@@ -240,6 +245,12 @@
       if (res.ok) {
         location.reload();
       }
+    }
+    
+    function toggleSection(btn) {
+      const content = btn.parentElement.nextElementSibling;
+      content.classList.toggle('collapsed');
+      btn.textContent = content.classList.contains('collapsed') ? '▶' : '▼';
     }
     
     window.onload = loadDashboard;
