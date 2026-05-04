@@ -142,6 +142,10 @@
             <option value="Other">Other</option>
           </select>
         </div>
+        <div class="form-group" style="display: flex; align-items: start; gap: 10px;">
+          <input type="checkbox" id="consent" style="margin-top: 5px;">
+          <label style="font-size: 0.85rem; color: #666; line-height: 1.4;">I agree to my details being used to contact me in accordance with the POPI Act.</label>
+        </div>
         <div class="nav">
           <button class="prev" onclick="prevStep()">Previous</button>
           <button class="next" onclick="submitFeedback()">Submit</button>
@@ -284,6 +288,12 @@
     }
     
     async function submitFeedback() {
+      const consent = document.getElementById('consent').checked;
+      if (!consent) {
+        alert('Please agree to the POPI Act consent to submit your feedback.');
+        return;
+      }
+      
       const contactName = document.getElementById('contact-name').value;
       const contactPhone = document.getElementById('contact-phone').value;
       const contactEmail = document.getElementById('contact-email').value;
