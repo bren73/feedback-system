@@ -284,15 +284,23 @@
     
     function noContact() {
       state.contactRequested = false;
-      submitFeedback();
+      // No contact details collected, skip POPI check
+      submitFeedbackNoConsent();
+    }
+    
+    async function submitFeedbackNoConsent() {
+      // For ratings 9-10: no contact details collected, skip POPI check
+      await submitFeedbackInternal();
     }
     
     async function submitFeedback() {
+      // Only require POPI consent when contact is requested
       const consent = document.getElementById('consent').checked;
       if (!consent) {
         alert('Please agree to the POPI Act consent to submit your feedback.');
         return;
       }
+      await submitFeedbackInternal();
       
       const contactName = document.getElementById('contact-name').value;
       const contactPhone = document.getElementById('contact-phone').value;
@@ -370,8 +378,10 @@
       } else if (rating <= 8) {
         showStep('feedback-neutral');
       } else {
-        // 9-10: Go straight to thank you (with Google Reviews)
-        submitFeedback();
+        // 9-10: Go straight to thank you (with Google Reviews) - no contact requested, no POPI needed
+        state.contactRequested = false;
+        state.feedbackText = '';
+        submitFeedbackNoConsent();
       }
     }
     
