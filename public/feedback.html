@@ -289,23 +289,26 @@
     }
     
     async function submitFeedbackNoConsent() {
-      // For ratings 9-10: no contact details collected, skip POPI check
+      // For ratings 9-10 and "no contact" - skip POPI check, go straight to submit
       await submitFeedbackInternal();
     }
     
     async function submitFeedback() {
-      // Only require POPI consent when contact is requested
-      const consent = document.getElementById('consent').checked;
-      if (!consent) {
+      // Only require POPI consent when contact is requested (user filled in form)
+      const consent = document.getElementById('consent');
+      if (consent && !consent.checked) {
         alert('Please agree to the POPI Act consent to submit your feedback.');
         return;
       }
       await submitFeedbackInternal();
-      
-      const contactName = document.getElementById('contact-name').value;
-      const contactPhone = document.getElementById('contact-phone').value;
-      const contactEmail = document.getElementById('contact-email').value;
-      const serviceType = document.getElementById('service-type').value;
+    }
+    
+    // Common function that handles the actual API submission
+    async function submitFeedbackInternal() {
+      const contactName = document.getElementById('contact-name')?.value || '';
+      const contactPhone = document.getElementById('contact-phone')?.value || '';
+      const contactEmail = document.getElementById('contact-email')?.value || '';
+      const serviceType = document.getElementById('service-type')?.value || '';
       
       const resp = await fetch('/api/feedback', {
         method: 'POST',
