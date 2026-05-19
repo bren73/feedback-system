@@ -6,7 +6,7 @@ NPS measures customer loyalty based on one simple question:
 
 > *"How likely are you to recommend us to a friend or colleague?"*
 
-Customers rate their likelihood on a scale of 0-10.
+Customers rate their likelihood on a scale of 1-10.
 
 ---
 
